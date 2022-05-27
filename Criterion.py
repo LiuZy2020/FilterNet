@@ -63,9 +63,9 @@ if __name__ == '__main__':
     plt.ylabel('True Positive Rate')
     with torch.no_grad():
         index = '1'
-        e_model = torch.load('./Model_saved/model_encoder_'+index+'.pth').cuda()
-        g_model = torch.load('./Model_saved/model_generator_'+index+'.pth').cuda()
-        c_model = torch.load('./Model_saved/model_classifier_'+index+'.pth').cuda()
+        e_model = torch.load('./Model_saved/model_encoder.pth').cuda()
+        g_model = torch.load('./Model_saved/model_generator.pth').cuda()
+        c_model = torch.load('./Model_saved/model_classifier.pth').cuda()
         e_model.eval()
         g_model.eval()
         c_model.eval()
