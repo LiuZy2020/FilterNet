@@ -47,7 +47,7 @@ def ConfusionMatrix(labels, preds, is_Tensor=True):
     print('TNR:', TNR)
 
 if __name__ == '__main__':
-    file_path_test = './Data'
+    file_path_test = './Data/...'
     Dataset = RadarDataset(file_path_test, len(file_path_test))
     images = Dataset.images
     images_n = Dataset.noised
