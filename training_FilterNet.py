@@ -193,7 +193,6 @@ def train_Classifier(e_model, g_model, model, Train_dataset, Validate_dataset, T
     )
     model.train()
 
-    best_test_acc = 0
     for epoch in range(epoches):
         loss_total = 0
         loss_total_ref = 0
@@ -247,8 +246,6 @@ def train_FilterNet(e_model, g_model, d_model, Train_dataset, epoches=50, learni
         D_optimizer, mode='min', factor=0.8, patience=10, verbose=True, min_lr=0.00001)
     d_model.train()
 
-
-    stop_point = 100
     for epoch in range(epoches):
         g_loss_total = 0
         d_loss_total = 0
@@ -314,23 +311,13 @@ decay = 4e-5
 LAMBDA_GP = 12
 lr_r = 0.004
 lr_d = 0.004
-Alpha = 12 # this param should be adjusted on different computer perhaps
-index = '2'
+Alpha = 12 # this param should be adjusted on different computer
+index = '1'
 latent_size = [8,8,8]
-var = 0.001
 pre_epoches = 100
 gan_epoches = 100
 
-def seed_torch(seed=1029):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED']=str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
 def main():
-    seed_torch(66)
     print(torch.__version__)
     file_path = './Data/Trainset/'
     Dataset_ = RadarDataset(file_path,len(file_path))
@@ -345,7 +332,7 @@ def main():
     ###start training
     E = encoder(input_channels=1).cuda()
     De = decoder(input_channels=1).cuda()
-    print('--------------Pre-train the encoder------------------ ')
+    print('--------------Pre-train the FilterNet------------------ ')
     e_model, de_model = pretrain_FilterNet(E, De, train_dataset, epoches=pre_epoches, learningRate=0.001) #50 epoches
     torch.save(e_model,'./Model_saved/model_encoder_pre_'+index+'.pth')
     torch.save(de_model, './Model_saved/model_decoder_'+index+'.pth')
@@ -358,7 +345,7 @@ def main():
     torch.save(g_model,'./Model_saved/model_generator_'+index+'.pth')
     torch.save(d_model, './Model_saved/model_discriminator_'+index+'.pth')
     torch.save(e_model, './Model_saved/model_encoder_'+index+'.pth')
-    print('-------------end generator training----------------')
+    print('-------------end FilterNet training----------------')
     print('-------------classifier training------------------- ')
     C = simple_Classifier(input_channels=1, num_classes=2).cuda()
     c_model = train_Classifier(e_model,g_model, C, train_dataset, validation_dataset, test_dataset,epoches=50, learningRate=0.001)
