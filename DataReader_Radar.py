@@ -5,30 +5,11 @@ from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 
 class RadarDataset(Dataset):
-    def __init__(self, file_path, path_len, CWdata=True):
+    def __init__(self, file_path, CWdata=True):
         self.file_path = file_path
-        self.path_len = path_len
         self.CWdata = CWdata
 
-        self.images, self.labels, self.noised, self.ForN = self.load_file2Spectrogam(self.file_path, self.path_len)
-
-    def addNoise(self, feature, SNR): ## add piper noise
-        feature_n = feature.copy()
-        c, h, w = feature_n.shape
-        mask = np.random.choice((0,1,2),size=(c,h,w),p=[SNR,(1-SNR)/2,(1-SNR)/2])
-        feature_n[mask==1] = 0
-        feature_n[mask==0] = 0
-        feature_n[mask==2] = 0
-        return feature_n
-
-    def addGauseNoise(self, feature, SNR, mean=0.0, var=1.0):
-        noise = np.random.normal(mean, var, feature.shape)
-        signal_power = 1/(feature.shape[1]*feature.shape[2])*np.sum(np.power(feature, 2))
-        noise_power = signal_power/np.power(10,(SNR/10))
-        noise = (np.sqrt(noise_power)/np.std(noise))*noise
-        feature_N = feature+noise
-        feature_N = 1*(feature_N-np.min(feature_N)) / (np.max(feature_N)-np.min(feature_N))
-        return feature_N, noise
+        self.images, self.labels, self.noised, self.ForN = self.load_file2Spectrogam(self.file_path)
 
     def addGauseNoise_simple(self, feature, SNR=0, mean=0, var=0.001, is_Tensor=False):
         if is_Tensor:
@@ -89,7 +70,7 @@ class RadarDataset(Dataset):
 
 if __name__ == '__main__':
     file_path = './Data/...'
-    dataset = RadarDataset(file_path, len(file_path), CWdata=True)
+    dataset = RadarDataset(file_path, CWdata=True)
     print(dataset.ForN.shape)
     plt.imshow(dataset.noised[2,0,:,:],cmap='jet')
     plt.show()
